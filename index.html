@@ -39,6 +39,16 @@
             overflow: hidden;
             position: relative;
         }
+        .info, .feeling{
+            background: #333;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 204, 0, 0.2);
+        }
         .game-card.expanded {
             height: auto;      /* 自动高度，显示全部 */
             background: #383838;
@@ -74,6 +84,19 @@
             opacity: 1;
             max-height: 2000px; /* 足够大 */
             margin-top: 12px;
+        }
+        .img-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width:100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.8);
+            z-index: 9998;
+            display: none;
+        }
+        .img-overlay.show {
+            display: block;
         }
         .game-card h2 {
             color: #ffcc00;
@@ -114,6 +137,24 @@
         .game-card.expanded::after {
             content: '▲';
             bottom: 10px;
+        }
+        #backToTop{
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: #ffcc00;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: none;
+            z-index: 999;
+        }
+        #backToTop.show{
+            display: block;
         }
         .enlarge {
             position: fixed !important;
@@ -223,6 +264,7 @@
           </div>
         </div>
     </div>
+    <button id="backToTop">⬆️</button>
     <script>
          // 1. 卡片点击展开/折叠
         const cards = document.querySelectorAll(".game-card");
@@ -230,17 +272,41 @@
             card.addEventListener("click", function(e){
                 // 防止点图片时同时触发卡片折叠（保留你原来的图片放大）
                 if(!e.target.classList.contains("game-img")){
+                    //先收起其它卡片
+                    cards.forEach(c =>{
+                        if(c !== this) c.classList.remove("expanded");
+                    });
+                    //再切换当前卡片的展开状态
                     this.classList.toggle("expanded");
                 }
             });
         });
+        //遮罩控制
         const images = document.querySelectorAll(".game-img");
-        images.forEach(img => {
-            img.addEventListener("click", function(e){
-               e.stopPropagation(); // 阻止事件冒泡，避免触发卡片折叠
-               this.classList.toggle("enlarge");
-            })
-        })
+        const overlay = document.createElement('div');
+        overlay.className = 'img-overlay';
+        document.body.appendChild(overlay);
+        images.forEach(img =>{
+            img.addEventListener("click",function(e){
+                e.stopPropagation();
+                this.classList.toggle("enlarge");
+                overlay.classList.toggle("show");
+            });
+        });
+        //点击遮罩关闭图片
+        overlay.addEventListener('click', function(){
+            document.querySelector('.game-img.enlarge').classList.remove('enlarge');
+            this.classList.remove('show');
+        });
+        window.addEventListener('scroll',function(){
+            const btn = document.getElementById('backToTop');
+            if(window.scrollY>300) btn.classList.add('show');
+            else btn.classList.remove('show');
+        });
+        //点击回到顶部
+        document.getElementById('backToTop').addEventListener('click',function(){
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
     </script>
     <script src="https://giscus.app/client.js"
         data-repo="Zhupengyu353-WQ/zhupy.github.io"
@@ -256,6 +322,6 @@
         data-lang="zh-CN"
         crossorigin="anonymous"
         async>
-     </script>
+    </script>
 </body>
 </html>
