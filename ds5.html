@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>DS手柄测试</title>
+<style>
+body{
+background: #1a1a1a;
+color: white;
+font-family: Arial;
+padding: 20px;
+margin: 0;
+}
+
+.controller-preview {
+position: relative;
+width: 850px; 
+height: 650px;
+margin: 40px auto;
+background: #333;
+}
+
+.svg-part {
+position: absolute;
+pointer-events: none;
+transform: scale(60%);
+transform-origin: top left;
+}
+
+.controller{
+display: flex;
+gap: 30px;
+margin: 0 auto 20px;
+justify-content: center;
+align-items: center;
+width: 100%;
+max-width: 600px;
+}
+
+.stick{
+width: 150px;
+height: 150px;
+border: 2px solid #666;
+border-radius: 50%;
+position: relative;
+background: #222;
+}
+
+.stick-point{
+width: 20px;
+height: 20px;
+background: #0f0;
+border-radius: 50%;
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%,-50%);
+}
+
+.button{
+padding: 10px;
+margin: 5px;
+background: #333;
+display: inline-block;
+border-radius: 6px;
+min-width: 40px;
+text-align: center;
+}
+.button.pressed{
+background: #0f0;
+color: black;
+}
+
+.key-shape {
+fill: none;
+stroke: #000;
+stroke-width: 2;
+transition: fill 0.1s;
+}
+
+.stick-on .key-shape {
+fill: #000 !important;
+stroke: #000 !important;
+}
+
+#key_l3, #key_r3 {
+transition: transform 0.05s linear;
+}
+
+.img-pressed {
+filter: drop-shadow(0 0 12px #0ff) brightness(1.4);
+}
+
+/* 扳机进度条样式 */
+.trigger-bar {
+  width: 200px;
+  height: 10px;
+  background: #444;
+  border-radius: 5px;
+  margin: 5px 0 5px;
+  overflow: hidden;
+}
+.trigger-fill {
+  height: 100%;
+  background: #0ff;
+  width: 0%;
+  transition: width 0.05s linear;
+}
+.trigger-box {
+  text-align: center;
+  margin: 0 10px;
+}
+.triggers {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin: 10px auto;
+}
+.trigger-value {
+  font-size: 14px;
+  color: #ccc;
+  height: 20px;
+}
+
+/* 摇杆数值显示 */
+.stick-info {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #ccc;
+  line-height: 1.4;
+}
+</style>
+</head>
+<body>
+<h1>DS手柄测试</h1>
+<p>请按任意按键激活手柄</p>
+
+<div>
+<h3>按键状态</h3>
+<div id="buttons"></div>
+</div>
+
+<!-- 扳机 L2 R2 按压幅度 + 数值显示 -->
+<div class="triggers">
+  <div class="trigger-box">
+    <div>L2 扳机</div>
+    <div class="trigger-bar"><div id="l2-fill" class="trigger-fill"></div></div>
+    <div class="trigger-value" id="l2-val">0.00</div>
+  </div>
+  <div class="trigger-box">
+    <div>R2 扳机</div>
+    <div class="trigger-bar"><div id="r2-fill" class="trigger-fill"></div></div>
+    <div class="trigger-value" id="r2-val">0.00</div>
+  </div>
+</div>
+
+<div class="controller-preview">
+<img src="底侧.svg" class="svg-part" style="left:156px; top:300px;">
+
+<svg class="svg-part" id="key_left" style="left:165px; top:280px; width:82px; height:74px;" viewBox="0 0 82 74">
+<path class="key-shape" d="M17.1221 1.08664L48.6221 4.96359L49.6221 5.08664L49.9482 5.12668L50.1865 5.35226L77.1865 30.8523L77.3408 30.9978L77.4229 31.1941L79.9229 37.1941L80.1094 37.6413L79.874 38.0642L77.374 42.5642L77.292 42.7136L77.1641 42.8259L50.1641 66.8259L49.9463 67.0193L49.6592 67.0661L34.1592 69.5661L34.1455 69.5681L17.1455 72.0681L16.7822 72.1218L8.34473 66.8484L8.24707 66.737L1.24707 58.737L1 58.4548V18.8425L6.21875 8.405L6.42676 8.25949L16.4268 1.25949L16.7412 1.03976L17.1221 1.08664Z"/>
+</svg>
+
+<svg class="svg-part" id="key_right" style="left:227px; top:280px; width:77px; height:71px;" viewBox="0 0 77 71">
+<path class="key-shape" d="M0.95578 35.0346L2.95578 28.5346L27.9558 5.03462L59.9558 1.03462L70.9558 7.53462L75.9558 14.0346V54.5346L70.9558 62.5346L59.9558 69.0346L27.9558 65.0346L2.95578 42.5346L0.95578 36.0346"/>
+</svg>
+
+<svg class="svg-part" id="key_up" style="left:200px; top:245px; width:68px; height:82px;" viewBox="0 0 68 82">
+<path class="key-shape" d="M50.2451 1L50.4629 1.11328L61.9629 7.11328L62.2227 7.24902L62.3682 7.50391L66.3682 14.5039L66.5127 14.7559L66.499 15.0469L64.999 47.0469L64.9844 47.3672L64.7861 47.6182L40.7861 78.1182L40.6006 78.3535L33.9854 80.5586L33.6582 80.4395L27.9111 78.3496L27.7412 78.1504L3.74121 50.1504L3.55469 49.9336L3.51172 49.6494L1.01172 33.1494L1 33.0752V14.6973L7.32227 5.21387L7.57422 5.09473L16.0742 1.09473L16.2764 1H50.2451Z"/>
+</svg>
+
+<svg class="svg-part" id="key_down" style="left:200px; top:310px; width:68px; height:79px;" viewBox="0 0 68 79">
+<path class="key-shape" d="M34.0335 0.913818L25.0335 4.91382L5.03351 28.4138L1.03351 63.4138L7.03351 72.9138L14.0335 77.9138H52.5335L59.5335 72.9138L66.0335 63.4138L63.5335 28.4138L44.0335 4.91382L35.0335 0.913818"/>
+</svg>
+
+<svg class="svg-part" id="key_l3" style="left:289px; top:360px; width:108px; height:111px;" viewBox="0 0 108 111">
+<path class="key-shape" d="M54 1C83.2977 1 107 25.4275 107 55.5C107 85.5725 83.2977 110 54 110C24.7023 110 1 85.5725 1 55.5C1 25.4275 24.7023 1 54 1Z"/>
+</svg>
+<img src="左摇杆2.svg" class="svg-part" style="left:270px; top:342px;">
+
+<svg class="svg-part" id="key_r3" style="left:495px; top:360px; width:108px; height:111px;" viewBox="0 0 108 111">
+<path class="key-shape" d="M54 1C83.2977 1 107 25.4275 107 55.5C107 85.5725 83.2977 110 54 110C24.7023 110 1 85.5725 1 55.5C1 25.4275 24.7023 1 54 1Z"/>
+</svg>
+<img src="右摇杆2.svg" class="svg-part" style="left:475px; top:342px;">
+
+<svg class="svg-part" id="key_cross" style="left:605px; top:320px; width:74px; height:78px;" viewBox="0 0 74 78">
+<path class="key-shape" d="M36.3655 1.00434C56.2701 0.691365 72.5876 17.4011 72.915 38.2165C73.2423 59.0322 57.4582 76.2475 37.5535 76.5604C17.6491 76.8732 1.33228 60.1627 1.00498 39.3472C0.67785 18.5319 16.4612 1.31753 36.3655 1.00434Z"/>
+</svg>
+
+<svg class="svg-part" id="key_circle" style="left:650px; top:280px; width:74px; height:78px;" viewBox="0 0 74 78">
+<path class="key-shape" d="M36.3655 1.00434C56.2701 0.691365 72.5876 17.4011 72.915 38.2165C73.2423 59.0322 57.4582 76.2475 37.5535 76.5604C17.6491 76.8732 1.33228 60.1627 1.00498 39.3472C0.67785 18.5319 16.4612 1.31753 36.3655 1.00434Z"/>
+</svg>
+
+<svg class="svg-part" id="key_square" style="left:560px; top:280px; width:74px; height:78px;" viewBox="0 0 74 78">
+<path class="key-shape" d="M36.3655 1.00434C56.2701 0.691365 72.5876 17.4011 72.915 38.2165C73.2423 59.0322 57.4582 76.2475 37.5535 76.5604C17.6491 76.8732 1.33228 60.1627 1.00498 39.3472C0.67785 18.5319 16.4612 1.31753 36.3655 1.00434Z"/>
+</svg>
+
+<svg class="svg-part" id="key_triangle" style="left:605px; top:240px; width:74px; height:78px;" viewBox="0 0 74 78">
+<path class="key-shape" d="M36.3655 1.00434C56.2701 0.691365 72.5876 17.4011 72.915 38.2165C73.2423 59.0322 57.4582 76.2475 37.5535 76.5604C17.6491 76.8732 1.33228 60.1627 1.00498 39.3472C0.67785 18.5319 16.4612 1.31753 36.3655 1.00434Z"/>
+</svg>
+
+<img src="左侧握把.svg" class="svg-part" style="left:105px; top:200px;">
+<img src="右侧握把.svg" class="svg-part" style="left:545px; top:200px;">
+
+<svg class="svg-part" id="key_l2" style="left:180px; top:50px; width:142px; height:165px;" viewBox="0 0 142 165">
+<path class="key-shape" d="M140.5 163.5H1V69.332L1.05469 69.1738L11.0547 40.1738L11.126 39.9668L11.2773 39.8086L33.3848 16.6963L33.5225 16.6211L62.0225 1.12109L62.2461 1H88.6514L88.7969 1.04492L117.797 10.0449L118.092 10.1367L118.284 10.3799L135.284 31.8799L135.39 32.0137L135.445 32.1738L140.445 46.6738L140.5 46.832V163.5Z"/>
+</svg>
+
+<svg class="svg-part" id="key_r2" style="left:585px; top:50px; width:139px; height:165px;" viewBox="0 0 139 165">
+<path class="key-shape" d="M137.5 164H1V54.3721L1.03223 54.248L7.53223 29.248L7.59863 28.9932L7.78223 28.8037L24.2822 11.8037L24.3936 11.6885L24.5352 11.6143L44.5352 1.11426L44.7539 1H66.1084L66.2148 1.02344L91.2148 6.52344L91.4111 6.56641L91.5752 6.6816L110.075 19.6816L110.176 19.7529L110.257 19.8467L129.257 41.8467L129.389 41.998L129.45 42.1895L137.45 66.6895L137.5 66.8408V164Z"/>
+</svg>
+
+<svg class="svg-part" id="key_l1" style="left:180px; top:192px; width:142px; height:45px;" viewBox="0 0 142 45">
+<path class="key-shape" d="M140.066 13.8672L139.208 13.9902L121.722 16.4883L96.2305 20.4863L68.7871 25.9756L37.7998 32.9717L3.8223 41.9668L1.78323 42.5068L2.65628 40.5859L7.65628 29.5859L7.77444 29.3262L17.0117 23.168L17.0899 23.1162L17.1748 23.0801L37.1748 14.5801L37.2285 14.5566L37.2842 14.541L62.7842 7.04102L62.8389 7.02441L62.8955 7.01465L85.8955 3.01465L85.9444 3.00586L85.9951 3.00293L113.995 1.00293L114.03 1H131.357L131.604 1.15625L137.104 4.65625L137.317 4.79297L137.44 5.01465L139.94 9.51465L140.066 9.74121V13.8672Z"/>
+</svg>
+
+<svg class="svg-part" id="key_r1" style="left:585px; top:191px; width:137px; height:46px;" viewBox="0 0 137 46">
+<path class="key-shape" d="M136 43.8243L134.728 43.463L101.259 33.9718L75.2812 27.9767L50.3291 22.9865L27.8467 19.4894L27.8213 19.4855L27.7959 19.4796L15.8613 16.9933L1.92871 15.9982L1 15.9318V9.19836L4.30273 4.24426L4.51465 4.12708L9.01465 1.62708L9.21973 1.51282L9.45508 1.50208L20.4551 1.00208L20.4893 1.00012L20.5244 1.0011L41.0244 1.5011L41.0811 1.50305L41.1377 1.51086L59.1377 4.01086L59.1719 4.01575L59.2061 4.02258L78.2061 8.02258L78.2422 8.0304L78.2783 8.04016L97.2783 13.5402L97.3281 13.5548L97.376 13.5743L115.876 21.0743L115.92 21.0919L115.961 21.1134L128.461 27.6134L128.655 27.715L128.789 27.8868L135.789 36.8868L136 37.1583V43.8243Z"/>
+</svg>
+
+<svg class="svg-part" id="key_share" style="left:260px; top:220px; width:39px; height:58px;" viewBox="0 0 39 58">
+<path class="key-shape" d="M13.9034 1.19803C18.8802 0.263196 23.8456 2.72204 27.8326 7.114C31.8324 11.5202 34.977 17.991 36.3823 25.4723C37.7875 32.9535 37.2051 40.1235 35.0769 45.6807C32.9554 51.2202 29.2207 55.3131 24.2438 56.248C19.267 57.1827 14.3025 54.7238 10.3156 50.3318C6.31578 45.9257 3.17132 39.4557 1.76602 31.9745C0.36075 24.4932 0.942986 17.3224 3.0713 11.7651C5.19278 6.22595 8.92677 2.13294 13.9034 1.19803Z"/>
+</svg>
+
+<svg class="svg-part" id="key_option" style="left:570px; top:220px; width:39px; height:58px;" viewBox="0 0 39 58">
+<path class="key-shape" d="M24.2444 1.19803C19.2676 0.263196 14.3022 2.72204 10.3152 7.114C6.31536 11.5202 3.17074 17.991 1.76547 25.4723C0.360266 32.9535 0.942671 40.1235 3.07092 45.6807C5.19241 51.2202 8.92708 55.3131 13.904 56.248C18.8807 57.1827 23.8453 54.7238 27.8322 50.3318C31.832 45.9257 34.9765 39.4557 36.3818 31.9745C37.787 24.4932 37.2048 17.3224 35.0765 11.7651C32.955 6.22595 29.221 2.13294 24.2444 1.19803Z"/>
+</svg>
+
+<img src="触摸板.svg" class="svg-part" id="key_touch" style="left:295px; top:190px;">
+<img src="扬声器.svg" class="svg-part" id="key_ps" style="left:390px; top:345px;">
+<img src="麦克风.svg" class="svg-part" id="key_mc" style="left:402px; top:435px;">
+</div>
+
+<div class="controller">
+  <div>
+    <h3>左摇杆</h3>
+    <div class="stick">
+      <div class="stick-point" id="pointL"></div>
+    </div>
+    <div class="stick-info" id="l-stick-info">X:0.00  Y:0.00</div>
+  </div>
+  <div>
+    <h3>右摇杆</h3>
+    <div class="stick">
+      <div class="stick-point" id="pointR"></div>
+    </div>
+    <div class="stick-info" id="r-stick-info">X:0.00  Y:0.00</div>
+  </div>
+</div>
+
+<script>
+const keyMap = {
+0:'cross',1:'circle',2:'square',3:'triangle',
+4:'l1',5:'r1',6:'l2',7:'r2',
+8:'share',9:'option',10:'l3',11:'r3',
+12:'up',13:'down',14:'left',15:'right',
+16:'ps',17:'touch',18:'mc'
+};
+
+const l3 = document.getElementById('key_l3');
+const r3 = document.getElementById('key_r3');
+const l2Fill = document.getElementById('l2-fill');
+const r2Fill = document.getElementById('r2-fill');
+const l2Val = document.getElementById('l2-val');
+const r2Val = document.getElementById('r2-val');
+const lStickInfo = document.getElementById('l-stick-info');
+const rStickInfo = document.getElementById('r-stick-info');
+
+setInterval(updateGamepad, 16);
+
+function updateGamepad(){
+const gamepads = navigator.getGamepads();
+if(!gamepads) return;
+const pad = gamepads[0];
+if(!pad) return;
+
+updateButtons(pad.buttons);
+updateSticks(pad.axes, pad.buttons);
+updateTriggers(pad);
+updatePadVisual(pad.buttons);
+}
+
+function updateButtons(buttons){
+const container = document.getElementById('buttons');
+container.innerHTML = '';
+for(let i=0; i<=18; i++) {
+const btn = buttons[i];
+const el = document.createElement('div');
+el.className = 'button' + (btn?.pressed ? ' pressed':'');
+
+const names = {
+  0: 'X',
+  1: 'O',
+  2: '▢',
+  3: '△',
+  4: 'L1',
+  5: 'R1',
+  6: 'L2',
+  7: 'R2',
+  8: 'SHARE',
+  9: 'OPTION',
+  10: 'L3',
+  11: 'R3',
+  12: '↑',
+  13: '↓',
+  14: '←',
+  15: '→',
+  16: 'PS',
+  17: 'TOUCH',
+  18: 'MIC'
+};
+el.textContent = names[i] || i;
+container.appendChild(el);
+}
+}
+
+function updateSticks(axes, buttons){
+const lx = axes[0] || 0;
+const ly = axes[1] || 0;
+const rx = axes[2] || 0;
+const ry = axes[3] || 0;
+
+setStick('pointL', lx, ly);
+setStick('pointR', rx, ry);
+
+// 显示摇杆坐标
+lStickInfo.textContent = `X:${lx.toFixed(5)}  Y:${ly.toFixed(5)}`;
+rStickInfo.textContent = `X:${rx.toFixed(5)}  Y:${ry.toFixed(5)}`;
+
+const maxOffset = 25;
+l3.style.transform = `scale(60%) translate(${lx * maxOffset}px, ${ly * maxOffset}px)`;
+r3.style.transform = `scale(60%) translate(${rx * maxOffset}px, ${ry * maxOffset}px)`;
+
+const lActive = (Math.abs(lx) > 0.1 || Math.abs(ly) > 0.1 || buttons[10]?.pressed);
+const rActive = (Math.abs(rx) > 0.1 || Math.abs(ry) > 0.1 || buttons[11]?.pressed);
+
+l3.classList.toggle('stick-on', lActive);
+r3.classList.toggle('stick-on', rActive);
+}
+
+function setStick(id, x, y){
+const p = document.getElementById(id);
+p.style.left = 50 + x*50 + '%';
+p.style.top  = 50 + y*50 + '%';
+}
+
+// 扳机进度条 + 数值更新
+function updateTriggers(pad) {
+  const l2 = pad.buttons[6]?.value || 0;
+  const r2 = pad.buttons[7]?.value || 0;
+  l2Fill.style.width = (l2 * 100) + '%';
+  r2Fill.style.width = (r2 * 100) + '%';
+  l2Val.textContent = l2.toFixed(2);
+  r2Val.textContent = r2.toFixed(2);
+}
+
+function updatePadVisual(buttons) {
+document.querySelectorAll('.key-shape').forEach(path => {
+path.style.fill = "none";
+path.style.stroke = "#000";
+});
+document.querySelectorAll('#key_ps,#key_touch,#key_mc').forEach(i=>i.classList.remove('img-pressed'));
+
+buttons.forEach((btn,i)=>{
+if(!btn?.pressed) return;
+const kn = keyMap[i];
+const el = document.getElementById('key_'+kn);
+if(!el) return;
+
+const path = el.querySelector('.key-shape');
+if(path){
+switch(kn){
+case 'cross': path.style.fill='#f55'; break;
+case 'circle': path.style.fill='#55f'; break;
+case 'square': path.style.fill='#ff5'; break;
+case 'triangle': path.style.fill='#5f5'; break;
+case 'up': case 'down': case 'left': case 'right': path.style.fill='#a5f'; break;
+case 'l1':case 'r1':case 'l2':case 'r2': path.style.fill='#5ff'; break;
+case 'share':case 'option': path.style.fill='#f5f'; break;
+}
+path.style.stroke='#000';
+return;
+}
+
+if(['ps','touch','mc'].includes(kn)) el.classList.add('img-pressed');
+});
+}
+</script>
+</body>
+</html>
