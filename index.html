@@ -172,6 +172,34 @@
 </head>
 <body>
     <h1>我的游戏收藏与评测</h1>
+    <div style="text-align:center; margin-bottom: 30px;">
+      <button onclick="window.location.href='ds5.html'" 
+            style="
+                padding: 12px 26px; 
+                background: #0077d6; /* 主色调 */
+                color: #fff; 
+                border: none; 
+                border-radius: 12px;
+                font-size: 16px; 
+                cursor: pointer; 
+                font-weight: bold;
+                transition: all 0.3s ease; /* 平滑动画过渡 */
+                box-shadow: 0 4px 6px rgba(0, 119, 214, 0.3); /* 柔和阴影 */
+            "
+            onmouseover="
+                this.style.background='#005da8'; /* 深一点的蓝色 */
+                this.style.transform='translateY(-2px)'; /* 轻微上浮 */
+                this.style.boxShadow='0 6px 12px rgba(0, 119, 214, 0.5)'; /* 阴影加深 */
+            "
+            onmouseout="
+                this.style.background='#0077d6'; /* 恢复原色 */
+                this.style.transform='translateY(0)'; /* 回到原位 */
+                this.style.boxShadow='0 4px 6px rgba(0, 119, 214, 0.3)'; /* 恢复阴影 */
+            "
+         >
+         🎮 DS5 手柄测试工具
+        </button>
+    </div>
     <div class="game-list">
        <div class="game-card">
           <img id="gameImg1" src="gamepic/mk11.jpg" alt="真人快打11" class="game-img">
