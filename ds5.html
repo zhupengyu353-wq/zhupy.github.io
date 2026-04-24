@@ -258,7 +258,7 @@ filter: drop-shadow(0 0 12px #0ff) brightness(1.4);
 // ======================
 //  WebSocket 连接 Python 后端，接收双指触摸坐标
 // ======================
-const ws = new WebSocket("ws://" + window.location.host + "/ws");
+const ws = new WebSocket("ws://127.0.0.1:8001");
 
 const touch1 = document.getElementById("touch1");
 const touch2 = document.getElementById("touch2");
